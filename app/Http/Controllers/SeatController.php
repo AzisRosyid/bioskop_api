@@ -13,7 +13,7 @@ class SeatController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('jwt.auth');
+        $this->middleware('jwt.authenticate');
     }
     /**
      * Display a listing of the resource.

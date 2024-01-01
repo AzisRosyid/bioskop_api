@@ -24,6 +24,7 @@ Route::post('register', [UserController::class, 'register']);
 Route::get('movie', [MovieController::class, 'index']);
 Route::get('movie/{id}', [MovieController::class, 'show']);
 Route::get('seat', [SeatController::class, 'index']);
+Route::get('ticket', [OrderController::class, 'index']);
 Route::post('order', [OrderController::class, 'store']);
 Route::post('orderdetail', [OrderController::class, 'storeDetail']);
 

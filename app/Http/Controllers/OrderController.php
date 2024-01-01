@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cinema;
+use App\Models\Movie;
+use App\Models\MovieSchedule;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
@@ -13,7 +16,50 @@ class OrderController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('jwt.auth');
+        $this->middleware('jwt.authenticate');
+    }
+
+    public function index() {
+        try {
+            $user = JWTAuth::user();
+
+            if (!$user) {
+                return response(['errors' => 'User not found'], 404);
+            }
+
+            $tickets = [];
+
+            $orders = Order::where('user_id', $user->id)->get();
+
+            foreach ($orders as $o) {
+                $orderDetails = OrderDetail::where('order_id', $o->id)->get();
+                foreach ($orderDetails as $d) {
+                    $movieSchedule = MovieSchedule::find($d->movie_schedule_id);
+                    if (!$movieSchedule) {
+                        continue;
+                    }
+
+                    $movie = Movie::find($movieSchedule->movie_id);
+                    $cinema = Cinema::find($movieSchedule->cinema_id);
+
+                    $ticket = [
+                        'movieTitle' => $movie ? $movie->title : 'N/A',
+                        'cinema' => $cinema ? $cinema->name : 'N/A',
+                        'seat' => $d->seat_id,
+                        'date' => $d->date_screening,
+                        'startTime' => $movieSchedule->start_time,
+                        'endTime' => $movieSchedule->end_time,
+                        'status' => Carbon::now()->toDateString() > Carbon::parse($d->date_screening)->toDateString() ? 'Expired' : 'Valid',
+                    ];
+
+                    $tickets[] = $ticket;
+                }
+            }
+
+            return response()->json(['tickets' => $tickets], 200);
+        } catch (\Exception $e) {
+            return response(['errors' => $e->getMessage()], 500);
+        }
     }
 
     public function store()

@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('jwt.authenticate')->except('login', 'register');
+    }
+
     public function login(Request $request)
     {
         $rules = [
@@ -64,7 +69,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
             'password_confirmation' => 'required|string|same:password',
             'name' => 'required|string',
-            'email' => 'required|string|email|unique',
+            'email' => 'required|string|email|unique:users',
         ];
 
         $validator = Validator::make($request->all(), $rules);

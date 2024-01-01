@@ -11,7 +11,7 @@ class MovieController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('jwt.auth');
+        $this->middleware('jwt.authenticate');
     }
 
     public function index()
