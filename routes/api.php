@@ -22,6 +22,7 @@ Route::get('refresh', [UserController::class, 'refreshToken']);
 Route::post('login', [UserController::class, 'login']);
 Route::post('register', [UserController::class, 'register']);
 Route::get('movie', [MovieController::class, 'index']);
+Route::post('movie', [MovieController::class, 'store']);
 Route::get('movie/{id}', [MovieController::class, 'show']);
 Route::get('seat', [SeatController::class, 'index']);
 Route::get('ticket', [OrderController::class, 'index']);

@@ -11,6 +11,7 @@ class Movie extends Model
         'title',
         'duration',
         'release_date',
+        'genre',
         'description',
         'price'
     ];
