@@ -17,7 +17,7 @@ return new class extends Migration
             $table->time('duration');
             $table->date('release_date');
             $table->string('genre');
-            $table->string('description');
+            $table->text('description');
             $table->double('price');
             $table->string('image')->nullable();
             $table->timestamps();

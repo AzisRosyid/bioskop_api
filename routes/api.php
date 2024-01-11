@@ -27,7 +27,7 @@ Route::get('movie/{id}', [MovieController::class, 'show']);
 Route::get('seat', [SeatController::class, 'index']);
 Route::get('ticket', [OrderController::class, 'index']);
 Route::post('order', [OrderController::class, 'store']);
-Route::post('orderdetail', [OrderController::class, 'storeDetail']);
+Route::post('order/detail', [OrderController::class, 'storeDetail']);
 
 Route::group([
     'middleware' => 'api',

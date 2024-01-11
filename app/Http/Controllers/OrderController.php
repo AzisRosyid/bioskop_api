@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Collection;
 
 class OrderController extends Controller
 {
@@ -19,7 +20,8 @@ class OrderController extends Controller
         $this->middleware('jwt.authenticate');
     }
 
-    public function index() {
+    public function index()
+    {
         try {
             $user = JWTAuth::user();
 
@@ -43,12 +45,14 @@ class OrderController extends Controller
                     $cinema = Cinema::find($movieSchedule->cinema_id);
 
                     $ticket = [
-                        'movieTitle' => $movie ? $movie->title : 'N/A',
+                        'movie_title' => $movie ? $movie->title : 'N/A',
+                        'movie_price' => $movie ? $movie->price : 'N/A',
+                        'movie_image' => $movie ? $movie->image : 'N/A',
                         'cinema' => $cinema ? $cinema->name : 'N/A',
                         'seat' => $d->seat_id,
                         'date' => $d->date_screening,
-                        'startTime' => $movieSchedule->start_time,
-                        'endTime' => $movieSchedule->end_time,
+                        'start_time' => $movieSchedule->start_time,
+                        'end_time' => $movieSchedule->end_time,
                         'status' => Carbon::now()->toDateString() > Carbon::parse($d->date_screening)->toDateString() ? 'Expired' : 'Valid',
                     ];
 
@@ -56,7 +60,12 @@ class OrderController extends Controller
                 }
             }
 
-            return response()->json(['tickets' => $tickets], 200);
+            // Ticket was order by status ('Valid' on top, then 'Expired' bottom), then order by date, then order by start time
+            $sortedTickets = (new Collection($tickets))->sortBy(function ($ticket) {
+                return [$ticket['date'], $ticket['start_time']];
+            })->sortByDesc('status')->values()->all();
+
+            return response()->json(['tickets' => $sortedTickets], 200);
         } catch (\Exception $e) {
             return response(['errors' => $e->getMessage()], 500);
         }
@@ -80,7 +89,8 @@ class OrderController extends Controller
         return response(['order' => $order, 'message' => 'Order Successfully Created!'], 201);
     }
 
-    public function storeDetail(Request $request) {
+    public function storeDetail(Request $request)
+    {
         $rules = [
             'order_id' => 'required|integer|min:0',
             'movie_schedule_id' => 'required|integer|min:0',

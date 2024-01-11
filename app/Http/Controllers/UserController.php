@@ -76,7 +76,6 @@ class UserController extends Controller
 
 
         if($validator->fails()){
-            // return response()->json($validator->errors(), 403);
             return response(['errors' => $validator->errors()->first()], 422);
         }
 
@@ -112,6 +111,7 @@ class UserController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'username' => $user->username,
+            'email' => $user->email
         ];
 
         return response()->json(['user' => $userData, 'token' => $newToken], 200);
